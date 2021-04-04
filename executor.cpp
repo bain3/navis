@@ -20,7 +20,6 @@ void update_state(httplib::Client &c,
                       {{"Accept", flash ? "application/vnd.github.flash-preview+json" : "application/vnd.github.ant-man-preview+json"}},
                       req.dump(),
                       "application/json");
-    std::cout << req.dump() << std::endl;
     if (res.error() != 0 || res->status != 201) {
         utils::print_message("Error", 31, "Error while setting new state for " + std::to_string(deployment_id));
     } else {
