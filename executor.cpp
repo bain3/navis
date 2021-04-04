@@ -10,9 +10,14 @@
 
 namespace fs = std::filesystem;
 
-void update_state(httplib::Client &c, const nlohmann::json &req,
-                  const std::string &token, const int &deployment_id, const std::string &repo) {
+void update_state(httplib::Client &c,
+                  const nlohmann::json &req,
+                  const std::string &token,
+                  const int &deployment_id,
+                  const std::string &repo,
+                  const bool &flash) {
     auto res = c.Post(("/repos/" + repo + "/deployments/" + std::to_string(deployment_id) + "/statuses").data(),
+                      {{"Accept", flash ? "application/vnd.github.flash-preview+json" : "application/vnd.github.ant-man-preview+json"}},
                       req.dump(),
                       "application/json");
     std::cout << req.dump() << std::endl;
@@ -53,7 +58,7 @@ void mark_others_inactive(httplib::Client &c,
                                                  "env_url"].get<std::string>();
             active_data[context.repo_name][context.environment].erase("env_url");
         }
-        update_state(c, req, token, active_id, context.repo_name);
+        update_state(c, req, token, active_id, context.repo_name, false);
     }
     active_data[""_json_pointer / context.repo_name / context.environment / "active"] = context.deployment_id;
     if (!env_url.empty()) {
@@ -89,7 +94,7 @@ void executor::deploy(const std::string &token, const std::string &hostname,
     if (!file.is_open()) {
         req["state"] = "error";
         utils::print_message("Error", 31, "Cannot open a new log file");
-        update_state(c, req, token, context.deployment_id, context.repo_name);
+        update_state(c, req, token, context.deployment_id, context.repo_name, false);
         return;
     }
     std::time_t result = std::time(nullptr);
@@ -99,8 +104,10 @@ void executor::deploy(const std::string &token, const std::string &hostname,
     utils::print_message("Info", 36, "Log file created");
     // publish log file
     req["state"] = "in_progress";
+    req["target_url"] = hostname + "/" + logfile.string();
+    update_state(c, req, token, context.deployment_id, context.repo_name, true);
+    req.erase("target_url");
     req["log_url"] = hostname + "/" + logfile.string();
-    update_state(c, req, token, context.deployment_id, context.repo_name);
 
     // set environment vars
     fs::path output_file = fs::absolute(fs::path("output") / internal_deployment_id);
@@ -150,7 +157,7 @@ void executor::deploy(const std::string &token, const std::string &hostname,
         mark_others_inactive(c, context, token, hostname, req.value("environment_url", ""));
 
     // finally update the state online
-    update_state(c, req, token, context.deployment_id, context.repo_name);
+    update_state(c, req, token, context.deployment_id, context.repo_name, false);
 }
 
 std::string executor::get_internal_deployment_id(const executor::DeploymentContext &context, const int &id) {
