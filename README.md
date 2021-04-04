@@ -112,6 +112,7 @@ The output should be a binary called navis(.exe) in the working directory.
 
 #### Dependencies and copyright
 All dependencies are already included in the `libs` folder.
+(Apart from OpenSSL)
 
 Navis is completely built on top of httplib, made by yhirose. Cryptographic functions
 like hmac and sha1 are made by Stephan Brumme. JSON implementation is by nlohmann.

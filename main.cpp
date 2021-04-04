@@ -12,11 +12,12 @@ bool send_response(httplib::Response &res, const int &code, const std::string &m
     body["status"] = code;
     body["detail"] = message;
     res.set_content(body.dump(), "application/json");
-    utils::print_message(code == 200 ? "Success" : "Error (" + std::to_string(code) + ")", code == 200 ? 32 : 31, message);
+    utils::print_message(code == 200 ? "Success" : "Error (" + std::to_string(code) + ")", code == 200 ? 32 : 31,
+                         message);
     return true;
 }
 
-int main([[maybe_unused]] int argc, char** argv) {
+int main([[maybe_unused]] int argc, char **argv) {
     httplib::Server svr;
     std::ifstream settings_file(argv[1]);
     if (!settings_file.is_open()) {

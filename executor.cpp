@@ -49,7 +49,8 @@ void mark_others_inactive(httplib::Client &c,
         req["state"] = "inactive";
         req["log_url"] = hostname + "/logs/" + executor::get_internal_deployment_id(context, active_id);
         if (active_data.contains(""_json_pointer / context.repo_name / context.environment / "env_url")) {
-            req["environment_url"] = active_data[""_json_pointer / context.repo_name / context.environment / "env_url"].get<std::string>();
+            req["environment_url"] = active_data[""_json_pointer / context.repo_name / context.environment /
+                                                 "env_url"].get<std::string>();
             active_data[context.repo_name][context.environment].erase("env_url");
         }
         update_state(c, req, token, active_id, context.repo_name);
@@ -102,7 +103,7 @@ void executor::deploy(const std::string &token, const std::string &hostname,
     update_state(c, req, token, context.deployment_id, context.repo_name);
 
     // set environment vars
-    fs::path output_file = fs::absolute(fs::path("output")/internal_deployment_id);
+    fs::path output_file = fs::absolute(fs::path("output") / internal_deployment_id);
     setenv("NAVIS_LOGFILE", fs::absolute(logfile).c_str(), true);
     setenv("NAVIS_REF", context.ref.data(), true);
     setenv("NAVIS_REPONAME", context.repo_name.data(), true);
@@ -125,7 +126,7 @@ void executor::deploy(const std::string &token, const std::string &hostname,
                 file_name = f.path().filename();
         }
         if (!file_name.empty())
-            req["environment_url"] = hostname+"/deployments/"+file_name;
+            req["environment_url"] = hostname + "/deployments/" + file_name;
     } else if (context.output_type == "url") {
         if (fs::exists(output_file)) {
             std::ifstream f(output_file);
@@ -160,8 +161,8 @@ std::string executor::get_internal_deployment_id(const executor::DeploymentConte
          context.repo_name.size() + context.environment.size() + deployment_id_str.size(),
          reinterpret_cast<unsigned char *>(&digest));
     std::stringstream ss;
-    ss<<std::hex<<std::setfill('0');
-    for(int i : digest)
-        ss<<std::setw(2)<<i;
+    ss << std::hex << std::setfill('0');
+    for (int i : digest)
+        ss << std::setw(2) << i;
     return ss.str();
 }
