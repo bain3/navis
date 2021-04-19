@@ -1,5 +1,5 @@
-#include "libs/httplib.h"
-#include "libs/json.hpp"
+#include <httplib.h>
+#include <nlohmann/json.hpp>
 #include "libs/sha1.h"
 #include "libs/hmac.h"
 #include "executor.h"

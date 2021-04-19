@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <mutex>
 #include "executor.h"
-#include "libs/httplib.h"
-#include "libs/json.hpp"
+#include <httplib.h>
+#include <nlohmann/json.hpp>
 #include "utils.h"
 #include <cstdlib>
 #include <sstream>
@@ -20,7 +20,7 @@ void update_state(httplib::Client &c,
                       {{"Accept", flash ? "application/vnd.github.flash-preview+json" : "application/vnd.github.ant-man-preview+json"}},
                       req.dump(),
                       "application/json");
-    if (res.error() != 0 || res->status != 201) {
+    if (res.error() != httplib::Error::Success || res->status != 201) {
         utils::print_message("Error", 31, "Error while setting new state for " + std::to_string(deployment_id));
     } else {
         utils::print_message("Info", 36, "Successfully set new state for " + std::to_string(deployment_id));
