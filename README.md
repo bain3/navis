@@ -11,7 +11,7 @@ $ ./navis /path/to/config/file.json
 [Sun Apr  1 04:20:00 1337][Info] Listening on port 42173
 ```
 All configuration is done through a single json file.
-```
+```json5
 {
   "host": "0.0.0.0", // network adapter (0.0.0.0 for everything)
   "public_hostname": "https://deploy.bain.cz", // used to construct URLs
